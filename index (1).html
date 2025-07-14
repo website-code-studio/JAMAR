@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jamar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos generales del cuerpo de la página */
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #f0f4f8;
+      background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      color: #333;
+      box-sizing: border-box;
+      position: relative; /* Necesario para posicionar el fondo Matrix */
+    }
+
+    /* Contenedor para el efecto Matrix de gotas de agua */
+    .matrix-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro para el efecto */
+      z-index: -1; /* Asegura que esté detrás de todo */
+      overflow: hidden; /* Mantiene el overflow oculto para el efecto en sí */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Estilo de cada columna de gotas en el efecto Matrix */
+    .matrix-column {
+      position: absolute;
+      white-space: pre; /* Mantiene los saltos de línea y espacios */
+      font-family: 'monospace'; /* Fuente monoespaciada para el efecto */
+      font-size: 20px; /* Tamaño de las gotas de agua */
+      color: #00FFFF; /* Un azul cian brillante para las gotas */
+      opacity: 0.7;
+      animation: matrix-fall linear infinite;
+    }
+
+    /* Animación de caída para las gotas de Matrix */
+    @keyframes matrix-fall {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(100vh); } /* Cae hasta el final de la ventana */
+    }
+
+    /* Contenedor del encabezado */
+    .header-container {
+      width: 90%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e6ed;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      margin-bottom: 40px;
+      transition: all 0.3s ease-in-out;
+      transform: translateY(0);
+      opacity: 0;
+      position: relative; /* Asegura que esté sobre el fondo Matrix */
+      z-index: 1;
+    }
+
+    /* Animación de aparición para el encabezado */
+    .header-container.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.2s;
+    }
+
+    /* Estilo del título principal */
+    h1 {
+      margin: 0;
+      font-size: 2.5em;
+      color: #2c3e50;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    /* Grupo de botones de navegación */
+    .nav-buttons-group {
+        display: flex;
+        gap: 15px; /* Espacio entre los botones de navegación */
+        flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+        justify-content: center;
+    }
+
+    /* Estilo de los botones de navegación */
+    .nav-button {
+      background-color: #3498db;
+      color: white;
+      padding: 14px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 1.15em;
+      white-space: nowrap;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Efecto hover para los botones de navegación */
+    .nav-button:hover {
+      background-color: #2980b9;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Contenido principal de la página */
+    .main-content {
+        width: 90%;
+        max-width: 800px;
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 50px;
+        transition: all 0.5s ease-out;
+        opacity: 0;
+        transform: translateY(20px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative; /* Asegura que esté sobre el fondo Matrix */
+        z-index: 1;
+    }
+
+    /* Animación de aparición para el contenido principal */
+    .main-content.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.4s;
+    }
+
+    /* Estilos para la gota de agua en la sección principal */
+    .water-drop-container {
+        position: relative;
+        width: 150px; /* Ajusta el tamaño según la nueva imagen */
+        height: 150px; /* Ajusta el tamaño según la nueva imagen */
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: floatUpDown 3s infinite ease-in-out;
+    }
+
+    /* Asegura que la imagen de la gota se ajuste */
+    .water-drop-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Asegura que la imagen se ajuste sin distorsionarse */
+    }
+
+    /* Animación de flotación para la gota de agua */
+    @keyframes floatUpDown {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+
+    /* Estilo del nombre del equipo */
+    .team-name {
+        font-size: 2.8em;
+        color: #3498db;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(52, 152, 219, 0.7);
+        margin-top: -15px;
+        animation: text-glow 2s infinite alternate;
+    }
+
+    /* Animación de brillo para el nombre del equipo */
+    @keyframes text-glow {
+      0% { text-shadow: 0 0 5px rgba(52, 152, 219, 0.7), 0 0 10px rgba(52, 152, 219, 0.5); }
+      50% { text-shadow: 0 0 15px rgba(52, 152, 219, 1), 0 0 25px rgba(52, 152, 219, 0.8); }
+      100% { text-shadow: 0 0 5px rgba(52, 152, 219, 0.7), 0 0 10px rgba(52, 152, 219, 0.5); }
+    }
+
+    /* Estilo de los párrafos en el contenido principal */
+    .main-content p {
+        font-size: 1.1em;
+        line-height: 1.7;
+        color: #555;
+        margin-bottom: 25px;
+        text-align: justify;
+    }
+
+    /* Estilo de los subtítulos en el contenido principal */
+    .main-content h2 {
+        font-size: 1.8em;
+        color: #2c3e50;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        border-bottom: 2px solid #e0e6ed;
+        padding-bottom: 10px;
+    }
+
+    /* Información sobre la crisis del agua */
+    .water-crisis-info {
+        text-align: left;
+        padding-top: 25px;
+        border-top: 1px solid #e0e6ed;
+        margin-top: 25px;
+    }
+
+    /* Estilos para los botones de interacción principal */
+    .main-interaction-buttons {
+      display: flex;
+      gap: 20px; /* Espacio entre los botones */
+      margin-top: 30px;
+      justify-content: center;
+    }
+
+    /* Estilo base para los botones de interacción */
+    .main-interaction-button {
+      background-color: #ff7f50; /* Un color naranja divertido para "Jugar con el Pulpo" */
+      color: white;
+      padding: 15px 35px;
+      border-radius: 12px;
+      font-size: 1.2em;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 6px 12px rgba(255, 127, 80, 0.4);
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 20px rgba(255, 127, 80, 0.6);
+    }
+
+    /* Efecto hover para los botones de interacción */
+    .main-interaction-button:hover {
+      background-color: #e0663f;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(255, 127, 80, 0.6);
+    }
+
+    /* Estilo específico para el botón de IA Jamar */
+    .main-interaction-button.ia-jamar {
+        background-color: #3498db; /* Azul para el chatbot */
+        box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);
+    }
+
+    /* Efecto hover para el botón de IA Jamar */
+    .main-interaction-button.ia-jamar:hover {
+        background-color: #2980b9;
+        box-shadow: 0 10px 20px rgba(52, 152, 219, 0.6);
+    }
+
+
+    /* Estilos del chatbot original IA Jamar */
+    .chat-container {
+      width: 350px;
+      height: 500px;
+      border: 1px solid #dcdfe4;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 1000;
+      transition: all 0.5s ease-out, height 0.3s ease, opacity 0.3s ease; /* Añadida opacidad para la transición */
+      opacity: 0; /* Oculto por defecto */
+      pointer-events: none; /* Deshabilitado por defecto */
+      transform: translateX(30px);
+      animation: glowing-border 2s infinite alternate;
+    }
+
+    /* Clase para hacer visible el chatbot */
+    .chat-container.visible {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+        transition-delay: 0.1s; /* Retraso para que la animación del botón se vea primero */
+    }
+
+    /* Clase para minimizar el chatbot */
+    .chat-container.minimized {
+        height: 60px;
+        animation: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Oculta los mensajes y el input cuando el chatbot está minimizado */
+    .chat-container.minimized .chat-messages,
+    .chat-container.minimized .chat-input {
+        display: none;
+    }
+
+    /* Animación de borde brillante para el chatbot */
+    @keyframes glowing-border {
+      from {
+        box-shadow: 0 0 0px rgba(52, 152, 219, 0.7), 0 12px 30px rgba(0, 0, 0, 0.2);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(52, 152, 219, 0.9), 0 12px 30px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    /* Encabezado del chatbot */
+    .chat-header {
+      background-color: #3498db;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3em;
+      border-bottom: 1px solid #2980b9;
+      border-top-left-radius: 17px;
+      border-top-right-radius: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Título del encabezado del chatbot */
+    .chat-header-title {
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    /* Botón de minimizar del chatbot */
+    .chat-minimize-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0 5px;
+        transition: transform 0.2s ease;
+    }
+
+    /* Efecto hover para el botón de minimizar del chatbot */
+    .chat-minimize-button:hover {
+        transform: scale(1.1);
+    }
+
+    /* Área de mensajes del chatbot */
+    .chat-messages {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #f9fbfd;
+      border-bottom-left-radius: 17px;
+      border-bottom-right-radius: 17px;
+    }
+
+    /* Estilo base para cada mensaje */
+    .message {
+      margin-bottom: 12px;
+      padding: 12px 18px;
+      border-radius: 20px;
+      max-width: 85%;
+      word-wrap: break-word;
+      font-size: 1em;
+      line-height: 1.5;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilo para mensajes del bot */
+    .message.bot {
+      background-color: #e3f2fd;
+      color: #1977d2;
+      margin-right: auto;
+      text-align: left;
+      border-bottom-left-radius: 6px;
+    }
+
+    /* Estilo para mensajes del usuario */
+    .message.user {
+      background-color: #bbdefb;
+      color: #0d47a1;
+      margin-left: auto;
+      text-align: right;
+      border-bottom-right-radius: 6px;
+    }
+
+    /* Área de entrada de texto del chatbot */
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #e0e6ed;
+      padding: 15px;
+      background-color: #ffffff;
+      border-bottom-left-radius: 17px;
+      border-bottom-right-radius: 17px;
+    }
+
+    /* Estilo del input de texto del chatbot */
+    .chat-input input {
+      flex-grow: 1;
+      border: 1px solid #ccd1d8;
+      padding: 12px;
+      border-radius: 25px;
+      margin-right: 12px;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Efecto focus para el input del chatbot */
+    .chat-input input:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Estilo del botón de enviar del chatbot */
+    .chat-input button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efecto hover para el botón de enviar del chatbot */
+    .chat-input button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+
+    /* Estilos para el contenedor del JUEGO del Pulpo */
+    .octopus-game-container {
+      width: 380px; /* Ligeramente más ancho */
+      height: 580px; /* Ligeramente más alto */
+      border: 1px solid #dcdfe4;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 1001; /* Mayor z-index para que esté sobre el chatbot */
+      transition: all 0.5s ease-out, height 0.3s ease, opacity 0.3s ease; /* Añadida opacidad para la transición */
+      opacity: 0; /* Oculto por defecto */
+      transform: scale(0.8);
+      pointer-events: none; /* Deshabilitado por defecto */
+    }
+
+    /* Clase para hacer visible el contenedor del juego */
+    .octopus-game-container.visible {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto; /* Habilitado cuando es visible */
+        animation: glowing-border 2s infinite alternate; /* Animación de borde solo cuando está visible */
+        transition-delay: 0.1s; /* Retraso para que la animación del botón se vea primero */
+    }
+
+    /* Clase para minimizar el contenedor del juego */
+    .octopus-game-container.minimized {
+        height: 60px;
+        animation: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Oculta el contenido y el input del juego cuando está minimizado */
+    .octopus-game-container.minimized .game-content,
+    .octopus-game-container.minimized .game-input {
+        display: none;
+    }
+
+    /* Encabezado del juego del pulpo */
+    .game-header {
+      background-color: #3498db;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3em;
+      border-bottom: 1px solid #2980b9;
+      border-top-left-radius: 17px;
+      border-top-right-radius: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Título del encabezado del juego */
+    .game-header-title {
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    /* Botón de minimizar del juego */
+    .game-minimize-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0 5px;
+        transition: transform 0.2s ease;
+    }
+
+    /* Efecto hover para el botón de minimizar del juego */
+    .game-minimize-button:hover {
+        transform: scale(1.1);
+    }
+
+    /* Sección de estadísticas del juego */
+    .game-stats {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 15px;
+        background-color: #e0f2f7;
+        color: #2c3e50;
+        font-size: 0.9em;
+        border-bottom: 1px solid #cce8f0;
+    }
+
+    /* Elemento individual de estadística */
+    .stat-item {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Icono de estadística */
+    .stat-icon {
+        margin-right: 5px;
+        font-weight: bold;
+    }
+
+    /* Contenido del juego (hábitat del pulpo, mensajes, etc.) */
+    .game-content {
+      flex-grow: 1;
+      padding: 15px 20px;
+      overflow-y: auto;
+      background-color: #f9fbfd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+
+    /* Contenedor del pulpo dentro del juego */
+    .game-octopus-area {
+        position: relative;
+        width: 120px; /* Tamaño del pulpo dentro del juego */
+        height: 120px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: floatUpDown 3s infinite ease-in-out; /* Misma animación para que flote */
+    }
+
+    /* Imagen del pulpo en el juego */
+    .game-octopus-image {
+        width: 100%;
+        height: 100%;
+        image-rendering: crisp-edges; /* Para que los píxeles se vean definidos */
+        image-rendering: pixelated; /* Para que los píxeles se vean definidos */
+        animation: pulseOctopus 2s infinite alternate; /* Animación de pulsación */
+    }
+
+    /* Animación de pulsación para el pulpo */
+    @keyframes pulseOctopus {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.05); }
+    }
+
+
+    /* Burbujas de mensaje estilo pixel */
+    .pixel-message-bubble {
+        position: absolute;
+        top: -30px; /* Posición sobre el pulpo */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        border: 2px solid #333;
+        padding: 8px 12px;
+        border-radius: 5px; /* Ligeramente redondeado */
+        font-size: 0.9em;
+        color: #333;
+        white-space: normal; /* Permitir que el texto se ajuste a la burbuja */
+        box-shadow: 2px 2px 0px #333; /* Sombra pixelada */
+        z-index: 10;
+        animation: fadeInScale 0.3s ease-out;
+        max-width: 80%; /* Para que no se salga, ajustado a 80% */
+        text-align: center;
+        box-sizing: border-box; /* Para incluir padding y borde en el ancho */
+    }
+
+    /* Triángulo inferior de la burbuja de mensaje */
+    .pixel-message-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -10px; /* Triángulo inferior */
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 15px;
+        height: 15px;
+        background-color: white;
+        border-bottom: 2px solid #333;
+        border-right: 2px solid #333;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); /* Para cortar el cuadrado */
+        box-shadow: 2px 2px 0px #333;
+    }
+
+    /* Animación de aparición y escala para la burbuja de mensaje */
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: translateX(-50%) scale(0.8); }
+        to { opacity: 1; transform: translateX(-50%) scale(1); }
+    }
+
+    /* Estilos para los botones de cuidado */
+    .care-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    /* Estilo de cada botón de cuidado */
+    .care-button {
+        background-color: #2ecc71; /* Verde para acciones */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efecto hover para los botones de cuidado */
+    .care-button:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+    }
+
+    /* Estilos para el historial de mensajes de juego/preguntas */
+    .game-messages-history {
+      width: 100%;
+      padding: 15px; /* Aumentado padding */
+      background-color: #eaf7fc;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+      margin-top: 10px;
+      max-height: 180px; /* Altura máxima para el scroll */
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    /* Estilo base para cada mensaje del juego */
+    .game-message {
+      margin-bottom: 8px;
+      font-size: 0.9em;
+      line-height: 1.4;
+      color: #444;
+    }
+
+    /* Estilo para acciones del jugador en el juego */
+    .game-message.player-action {
+        color: #0d47a1;
+        font-weight: 600;
+    }
+
+    /* Estilo para respuestas del pulpo en el juego */
+    .game-message.octopus-response {
+        color: #1977d2;
+    }
+
+    /* Área de entrada de texto del juego */
+    .game-input {
+      display: flex;
+      border-top: 1px solid #e0e6ed;
+      padding: 15px;
+      background-color: #ffffff;
+      border-bottom-left-radius: 17px;
+      border-bottom-right-radius: 17px;
+    }
+
+    /* Estilo del input de texto del juego */
+    .game-input input {
+      flex-grow: 1;
+      border: 1px solid #ccd1d8;
+      padding: 12px;
+      border-radius: 25px;
+      margin-right: 12px;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Efecto focus para el input del juego */
+    .game-input input:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Estilo del botón de enviar del juego */
+    .game-input button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efecto hover para el botón de enviar del chatbot */
+    .chat-input button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Corregido: valor completo */
+    }
+
+
+    /* Estilos para el contenedor del JUEGO del Pulpo */
+    .octopus-game-container {
+      width: 380px; /* Ligeramente más ancho */
+      height: 580px; /* Ligeramente más alto */
+      border: 1px solid #dcdfe4;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 1001; /* Mayor z-index para que esté sobre el chatbot */
+      transition: all 0.5s ease-out, height 0.3s ease, opacity 0.3s ease; /* Añadida opacidad para la transición */
+      opacity: 0; /* Oculto por defecto */
+      transform: scale(0.8);
+      pointer-events: none; /* Deshabilitado por defecto */
+    }
+
+    /* Clase para hacer visible el contenedor del juego */
+    .octopus-game-container.visible {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto; /* Habilitado cuando es visible */
+        animation: glowing-border 2s infinite alternate; /* Animación de borde solo cuando está visible */
+        transition-delay: 0.1s; /* Retraso para que la animación del botón se vea primero */
+    }
+
+    /* Clase para minimizar el contenedor del juego */
+    .octopus-game-container.minimized {
+        height: 60px;
+        animation: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Oculta el contenido y el input del juego cuando está minimizado */
+    .octopus-game-container.minimized .game-content,
+    .octopus-game-container.minimized .game-input {
+        display: none;
+    }
+
+    /* Encabezado del juego del pulpo */
+    .game-header {
+      background-color: #3498db;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3em;
+      border-bottom: 1px solid #2980b9;
+      border-top-left-radius: 17px;
+      border-top-right-radius: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Título del encabezado del juego */
+    .game-header-title {
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    /* Botón de minimizar del juego */
+    .game-minimize-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0 5px;
+        transition: transform 0.2s ease;
+    }
+
+    /* Efecto hover para el botón de minimizar del juego */
+    .game-minimize-button:hover {
+        transform: scale(1.1);
+    }
+
+    /* Sección de estadísticas del juego */
+    .game-stats {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 15px;
+        background-color: #e0f2f7;
+        color: #2c3e50;
+        font-size: 0.9em;
+        border-bottom: 1px solid #cce8f0;
+    }
+
+    /* Elemento individual de estadística */
+    .stat-item {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Icono de estadística */
+    .stat-icon {
+        margin-right: 5px;
+        font-weight: bold;
+    }
+
+    /* Contenido del juego (hábitat del pulpo, mensajes, etc.) */
+    .game-content {
+      flex-grow: 1;
+      padding: 15px 20px;
+      overflow-y: auto;
+      background-color: #f9fbfd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+
+    /* Contenedor del pulpo dentro del juego */
+    .game-octopus-area {
+        position: relative;
+        width: 120px; /* Tamaño del pulpo dentro del juego */
+        height: 120px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: floatUpDown 3s infinite ease-in-out; /* Misma animación para que flote */
+    }
+
+    /* Imagen del pulpo en el juego */
+    .game-octopus-image {
+        width: 100%;
+        height: 100%;
+        image-rendering: crisp-edges; /* Para que los píxeles se vean definidos */
+        image-rendering: pixelated; /* Para que los píxeles se vean definidos */
+        animation: pulseOctopus 2s infinite alternate; /* Animación de pulsación */
+    }
+
+    /* Animación de pulsación para el pulpo */
+    @keyframes pulseOctopus {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.05); }
+    }
+
+
+    /* Burbujas de mensaje estilo pixel */
+    .pixel-message-bubble {
+        position: absolute;
+        top: -30px; /* Posición sobre el pulpo */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        border: 2px solid #333;
+        padding: 8px 12px;
+        border-radius: 5px; /* Ligeramente redondeado */
+        font-size: 0.9em;
+        color: #333;
+        white-space: normal; /* Permitir que el texto se ajuste a la burbuja */
+        box-shadow: 2px 2px 0px #333; /* Sombra pixelada */
+        z-index: 10;
+        animation: fadeInScale 0.3s ease-out;
+        max-width: 80%; /* Para que no se salga, ajustado a 80% */
+        text-align: center;
+        box-sizing: border-box; /* Para incluir padding y borde en el ancho */
+    }
+
+    /* Triángulo inferior de la burbuja de mensaje */
+    .pixel-message-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -10px; /* Triángulo inferior */
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 15px;
+        height: 15px;
+        background-color: white;
+        border-bottom: 2px solid #333;
+        border-right: 2px solid #333;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); /* Para cortar el cuadrado */
+        box-shadow: 2px 2px 0px #333;
+    }
+
+    /* Animación de aparición y escala para la burbuja de mensaje */
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: translateX(-50%) scale(0.8); }
+        to { opacity: 1; transform: translateX(-50%) scale(1); }
+    }
+
+    /* Estilos para los botones de cuidado */
+    .care-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    /* Estilo de cada botón de cuidado */
+    .care-button {
+        background-color: #2ecc71; /* Verde para acciones */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efecto hover para los botones de cuidado */
+    .care-button:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+    }
+
+    /* Estilos para el historial de mensajes de juego/preguntas */
+    .game-messages-history {
+      width: 100%;
+      padding: 15px; /* Aumentado padding */
+      background-color: #eaf7fc;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+      margin-top: 10px;
+      max-height: 180px; /* Altura máxima para el scroll */
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    /* Estilo base para cada mensaje del juego */
+    .game-message {
+      margin-bottom: 8px;
+      font-size: 0.9em;
+      line-height: 1.4;
+      color: #444;
+    }
+
+    /* Estilo para acciones del jugador en el juego */
+    .game-message.player-action {
+        color: #0d47a1;
+        font-weight: 600;
+    }
+
+    /* Estilo para respuestas del pulpo en el juego */
+    .game-message.octopus-response {
+        color: #1977d2;
+    }
+
+    /* Área de entrada de texto del juego */
+    .game-input {
+      display: flex;
+      border-top: 1px solid #e0e6ed;
+      padding: 15px;
+      background-color: #ffffff;
+      border-bottom-left-radius: 17px;
+      border-bottom-right-radius: 17px;
+    }
+
+    /* Estilo del input de texto del juego */
+    .game-input input {
+      flex-grow: 1;
+      border: 1px solid #ccd1d8;
+      padding: 12px;
+      border-radius: 25px;
+      margin-right: 12px;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Efecto focus para el input del juego */
+    .game-input input:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Estilo del botón de enviar del juego */
+    .game-input button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Efecto hover para el botón de enviar del juego */
+    .game-input button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Media queries para diseño responsivo en pantallas pequeñas (hasta 768px) */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      .header-container {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+        margin-bottom: 25px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+      }
+
+      .nav-buttons-group {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .nav-button {
+        margin-left: 0;
+        width: 90%;
+        text-align: center;
+        padding: 10px 20px;
+      }
+
+      .main-content {
+          padding: 25px;
+          margin-bottom: 30px;
+      }
+
+      .main-content h2 {
+          font-size: 1.4em;
+      }
+
+      .main-content p {
+          font-size: 1em;
+      }
+
+      .chat-container, .octopus-game-container {
+        width: 95%;
+        height: 80vh;
+        bottom: 15px;
+        right: 2.5%;
+        left: 2.5%;
+        margin: auto;
+      }
+
+      .message, .game-message {
+        max-width: 90%;
+        font-size: 0.9em;
+      }
+
+      .chat-input, .game-input {
+          padding: 10px;
+      }
+
+      .chat-input input, .game-input input {
+          padding: 10px;
+      }
+
+      .chat-input button, .game-input button {
+          padding: 10px 15px;
+      }
+
+      .main-interaction-buttons {
+          flex-direction: column;
+          gap: 15px;
+      }
+
+      .main-interaction-button {
+          width: 80%;
+          padding: 12px 25px;
+          font-size: 1.1em;
+      }
+    }
+
+    /* Estilos para la tabla de clasificación */
+    .leaderboard-container {
+        position: fixed;
+        top: 120px; /* Debajo del encabezado */
+        left: 20px;
+        width: 280px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        z-index: 999; /* Asegura que esté sobre el contenido principal */
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: calc(100vh - 150px); /* Altura máxima con scroll */
+        overflow-y: auto;
+        opacity: 0; /* Oculto por defecto */
+        transform: translateX(-30px);
+        transition: all 0.5s ease-out;
+    }
+
+    .leaderboard-container.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .leaderboard-container h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 1.4em;
+        border-bottom: 2px solid #e0e6ed;
+        padding-bottom: 10px;
+    }
+
+    .leaderboard-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .leaderboard-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #e9ecef;
+        font-size: 0.95em;
+        color: #555;
+    }
+
+    .leaderboard-item:last-child {
+        border-bottom: none;
+    }
+
+    .leaderboard-item .rank {
+        font-weight: bold;
+        color: #3498db;
+        margin-right: 10px;
+    }
+
+    .leaderboard-item .username {
+        flex-grow: 1;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .leaderboard-item .score {
+        font-weight: bold;
+        color: #2ecc71;
+    }
+
+    /* Estilo para el modal de selección de usuario */
+    .username-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .username-modal-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .username-modal {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+
+    .username-modal-overlay.visible .username-modal {
+        transform: translateY(0);
+    }
+
+    .username-modal h3 {
+        margin-top: 0;
+        color: #2c3e50;
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .username-modal input {
+        width: calc(100% - 24px);
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccd1d8;
+        border-radius: 8px;
+        font-size: 1em;
+        outline: none;
+    }
+
+    .username-modal button {
+        background-color: #3498db;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+    .username-modal button:hover {
+        background-color: #2980b9;
+    }
+
+    /* Media queries para el leaderboard en pantallas pequeñas */
+    @media (max-width: 768px) {
+        .leaderboard-container {
+            position: static; /* No fijo en móvil */
+            width: 90%;
+            margin: 20px auto; /* Centrar y dar margen */
+            max-height: none; /* Eliminar altura máxima */
+            opacity: 1; /* Siempre visible */
+            transform: translateX(0); /* Eliminar transformación */
+        }
+        .main-content {
+            padding-top: 20px; /* Ajustar padding para no chocar con el leaderboard */
+        }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Contenedor para el efecto Matrix de gotas de agua -->
+<div class="matrix-background" id="matrix-background"></div>
+
+<div class="header-container" id="header-container">
+  <h1>Jamar</h1>
+  <div class="nav-buttons-group">
+    <a href="https://elcomercio.pe/lima/sucesos/aquafondo-en-el-peru-se-pierde-hasta-el-65-del-agua-anualmente-noticia/" class="nav-button" target="_blank">Noticia 1</a>
+    <a href="https://waterpartners.com.pe/el-peru-sufrira-estres-hidrico-en-2025-retos-y-soluciones-urgentes/" class="nav-button" target="_blank">Noticia 2</a>
+    <a href="https://elcomercio.pe/lima/mas-de-3-millones-de-peruanos-sin-agua-potable-causas-consecuencias-y-retos-de-una-de-las-crisis-mas-urgentes-del-pais-informe-noticia/" class="nav-button" target="_blank">Noticias Relevantes</a>
+  </div>
+</div>
+
+<div class="main-content" id="main-content">
+  <div class="water-drop-container">
+    <img src="https://static.vecteezy.com/system/resources/previews/008/468/264/non_2x/isolated-clean-water-blue-drop-illustration-vector.jpg" alt="Gota de agua transparente" class="water-drop">
+  </div>
+  <div class="team-name">Jamar</div>
+
+  <div class="main-interaction-buttons">
+    <button class="main-interaction-button ia-jamar" id="open-ia-jamar-button">IA Jamar</button>
+    <button class="main-interaction-button" id="open-octopus-game-button">Jugar con el Pulpo</button>
+  </div>
+
+  <div class="water-crisis-info">
+    <h2>Crisis del Agua en Perú: Más de 3 Millones de Peruanos Sin Acceso al Recurso Vital</h2>
+    <p>
+      En Perú, la crisis del agua potable es una realidad alarmante que afecta a millones de personas. Se estima que alrededor de **3.3 a 3.5 millones de peruanos no tienen acceso a servicios de agua potable**, y de esta cifra, aproximadamente 2 millones residen en Lima. Esta brecha se mantiene debido a una combinación de factores estructurales, incluyendo la **falta de infraestructura adecuada, una gobernanza débil y una escasa planificación** en la gestión del recurso hídrico. Regiones como Loreto, Ucayali y Pasco experimentan esta escasez de manera más pronunciada, donde el acceso al agua limpia sigue siendo un privilegio.
+    </p>
+    <p>
+      La situación es especialmente crítica en la costa peruana, una zona desértica con ríos pequeños, donde la escasez de agua es más común, afectando a ciudades como Tumbes, Piura, Trujillo, Lima e Ica. La Autoridad Nacional del Agua (ANA) impulsa el uso de aguas subterráneas como una solución, pero se requiere una gestión mucho más efectiva por parte del Estado y una mayor incorporación del sector privado. Expertos coinciden en que el agua es un servicio público esencial que no está siendo gestionado técnicamente de manera eficiente.
+    </p>
+    <p>
+      Además del acceso limitado, la **contaminación del agua** y la inequidad en su distribución agravan la situación. La Sunass ha señalado que el 26% de la población no cuenta con servicio de alcantarillado. Si bien ha habido una reducción en la población sin acceso al agua potable entre 2012 y 2021 (aproximadamente 2 millones de personas), la brecha aún es considerable, especialmente en el ámbito rural. Se advierte que, de no cambiar la tendencia actual, esta brecha podría afectar a las próximas tres generaciones.
+    </p>
+    <p>
+      La gestión ineficiente de las empresas municipales y estatales de agua y saneamiento, muchas de las cuales están 'quebradas, incompetentes y con poca transparencia', es un obstáculo clave. La agricultura consume el 89% del volumen de agua disponible anualmente, lo que también subraya la necesidad de una gestión más eficiente del recurso. La educación a la población y a las autoridades para fomentar una cultura de ahorro y cuidado del agua es fundamental, dado que el Perú se encuentra en un rango de estrés hídrico significativo, haciéndolo uno de los países más vulnerables a la crisis del agua en América Latina.
+    </p>
+
+    <!-- Información adicional sobre la situación del desperdicio de agua en Perú -->
+    <h2>Situación del Desperdicio de Agua en Perú (2023-2025) - Información Adicional</h2>
+    <p>
+      Perú enfrenta una severa crisis hídrica, con proyecciones que indican un **estrés hídrico significativo para el año 2025**. Esta situación se caracteriza por una demanda de agua que supera la oferta disponible, afectando a millones de ciudadanos y teniendo repercusiones económicas y ambientales.
+    </p>
+    <h3>Cifras y Realidad del Desperdicio y Acceso</h3>
+    <ul>
+      <li>**Pérdida de Agua:** Se estima que en Perú se pierde hasta el **65% del agua anualmente** debido a ineficiencias en la gestión y la infraestructura. Algunas empresas de agua y saneamiento (EPS) reportan entre un 60% y 80% de "agua no facturada", lo que incluye pérdidas por fugas y uso ineficiente.</li>
+      <li>**Acceso Limitado:** A partir de 2023, aproximadamente **3.3 millones de peruanos carecen de acceso a una red pública de agua potable**, y 6.4 millones no cuentan con conexiones de alcantarillado. Un informe de mayo de 2024 (con datos de 2023) del INEI reveló que el **73.7% de los peruanos no tiene acceso a agua segura**, siendo la brecha más pronunciada en áreas rurales (97.5%).</li>
+      <li>**Riesgo en Zonas Urbanas:** Ciudades como Lima y Callao enfrentan un riesgo inminente de desabastecimiento de agua potable debido a problemas de infraestructura y gestión.</li>
+    </ul>
+    <h3>Causas Principales del Problema</h3>
+    <p>La crisis se atribuye a múltiples factores:</p>
+    <ul>
+      <li>**Infraestructura Deficiente:** Falta de inversión y mantenimiento en redes de distribución y sistemas de saneamiento.</li>
+      <li>**Gestión Inadecuada:** Gobernanza débil, planificación insuficiente y fragmentación institucional en el manejo del recurso hídrico.</li>
+      <li>**Distribución Desigual:** La mayor parte de la población se concentra en la costa (70%), que solo recibe el 2% del agua disponible en el país, exacerbando la escasez.</li>
+      <li>**Cambio Climático:** El retroceso de los glaciares tropicales, el aumento de temperaturas y los fenómenos climáticos extremos (como sequías) impactan directamente la disponibilidad de agua.</li>
+      <li>**Uso Agrícola Intensivo:** La agricultura consume el 89% del volumen de agua disponible anualmente, lo que también subraya la necesidad de sistemas de riego más eficientes.</li>
+    </ul>
+    <h3>Impactos del Estrés Hídrico</h3>
+    <p>Las consecuencias de esta situación son graves y multifacéticas:</p>
+    <ul>
+      <li>**Económicos:** Se proyecta una pérdida de hasta 35 mil empleos y una reducción del 2.2% del PBI total en Lima para 2025.</li>
+      <li>**Salud Pública:** La falta de agua potable y saneamiento adecuado puede provocar brotes de enfermedades transmitidas por el agua.</li>
+      <li>**Ecosistemas:** La reducción de la disponibilidad de agua afecta la biodiversidad y altera el equilibrio ecológico en ríos, lagos y humedales.</li>
+      <li>**Sociales:** Las comunidades rurales e indígenas son las más afectadas, profundizando la desigualdad en el acceso a un derecho humano fundamental.</li>
+    </ul>
+    <h3>Iniciativas y Soluciones en Curso</h3>
+    <p>El gobierno y diversas organizaciones están implementando medidas para abordar la crisis:</p>
+    <ul>
+      <li>**Inversión en Infraestructura:** El Ministerio de Vivienda, Construcción y Saneamiento tiene una cartera de proyectos de S/ 2,000 millones para 2025, enfocados en el tratamiento de aguas residuales.</li>
+      <li>**Marco Normativo:** Se han establecido nuevos valores para los cargos por uso de agua y descarga de aguas residuales (Decreto Supremo N° 015-2024-MIDAGRI) para 2025, buscando promover un uso más eficiente.</li>
+      <li>**Economía Circular:** Se impulsa una "Hoja de Ruta hacia una economía circular en agua y saneamiento" para fomentar la eficiencia y el reúso del agua.</li>
+      <li>**Proyectos de Gestión:** Se desarrollan proyectos para optimizar sistemas de riego, mejorar la gestión del agua en comunidades rurales y establecer fondos de agua para la protección de fuentes hídricas.</li>
+      <li>**Concientización:** Se reconoce la necesidad fundamental de educar a la población sobre el ahorro y cuidado del agua.</li>
+    </ul>
+    <h3>Desafíos y Perspectivas Futuras</h3>
+    <p>
+      A pesar de los avances, persisten desafíos significativos. La brecha en el acceso a servicios de agua y saneamiento, especialmente en zonas rurales, sigue siendo considerable. La gestión ineficiente de las empresas de agua, la contaminación y la inequidad en la distribución son obstáculos clave. Se requiere una mayor inversión, una gobernanza más sólida y una participación activa de todos los sectores para lograr una gestión hídrica sostenible. La concientización ciudadana y la implementación de tecnologías innovadoras son fundamentales para mitigar los efectos del estrés hídrico y asegurar el recurso vital para las futuras generaciones.
+    </p>
+    <p>La situación hídrica en Perú es un desafío complejo que requiere una acción coordinada y sostenida para garantizar la disponibilidad y el acceso seguro al agua para las generaciones presentes y futuras.</p>
+  </div>
+</div>
+
+<div class="chat-container" id="chat-container">
+  <div class="chat-header">
+    <span class="chat-header-title">IA Jamar</span>
+    <button class="minimize-button chat-minimize-button" id="chat-minimize-button">&minus;</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+  </div>
+  <div class="chat-input">
+    <input type="text" id="chat-user-input" placeholder="Escribe tu mensaje..." onkeypress="handleChatKeyPress(event)">
+    <button id="chat-send-button" onclick="sendChatMessage()">Enviar</button>
+  </div>
+</div>
+
+<div class="octopus-game-container" id="octopus-game-container">
+  <div class="game-header">
+    <span class="game-header-title">El Pulpo Sabio</span>
+    <button class="minimize-button game-minimize-button" id="game-minimize-button">&minus;</button>
+  </div>
+
+  <div class="game-stats">
+    <div class="stat-item"><span class="stat-icon">🌟</span> Nivel: <span id="level-display">1</span></div>
+    <div class="stat-item"><span class="stat-icon">❤️</span> Salud: <span id="health-display">100%</span></div>
+    <div class="stat-item"><span class="stat-icon">😊</span> Felicidad: <span id="happiness-display">100%</span></div>
+  </div>
+
+  <div class="game-content" id="game-content">
+    <div class="game-octopus-area">
+      <img src="https://i.pinimg.com/originals/75/1c/21/751c21e35690edecb056221bd6b366dd.png" alt="Pulpo del Juego" class="game-octopus-image" id="game-octopus-image">
+      <div id="octopus-speech-bubble" class="pixel-message-bubble" style="display:none;"></div>
+    </div>
+
+    <div class="care-buttons">
+      <button class="care-button" onclick="performCareAction('feed')">Alimentar</button>
+      <button class="care-button" onclick="performCareAction('bath')">Bañar</button>
+      <button class="care-button" onclick="performCareAction('play')">Pregúntame</button>
+    </div>
+
+    <div class="game-messages-history" id="game-messages-history">
+      </div>
+
+  </div>
+  <div class="game-input">
+    <input type="text" id="game-user-input" placeholder="Escribe tu respuesta o acción..." onkeypress="handleGameKeyPress(event)">
+    <button id="game-send-button" onclick="sendGameMessage()">Enviar</button>
+  </div>
+</div>
+
+<!-- Modal para seleccionar nombre de usuario -->
+<div class="username-modal-overlay" id="username-modal-overlay">
+  <div class="username-modal">
+    <h3>Elige tu nombre de usuario</h3>
+    <input type="text" id="username-input" placeholder="Tu nombre de usuario">
+    <button id="save-username-button">Guardar</button>
+  </div>
+</div>
+
+<!-- Tabla de Clasificación -->
+<div class="leaderboard-container" id="leaderboard-container">
+    <h3>Tabla de Clasificación</h3>
+    <ul class="leaderboard-list" id="leaderboard-list">
+        <!-- Los elementos de la clasificación se insertarán aquí por JavaScript -->
+        <li>Cargando clasificación...</li>
+    </ul>
+</div>
+
+
+<script>
+  // Local Storage Keys
+  const LOCAL_STORAGE_GAME_DATA_KEY = 'jamarGameData';
+  const LOCAL_STORAGE_USERNAME_KEY = 'jamarUsername';
+  const LOCAL_STORAGE_LEADERBOARD_KEY = 'jamarLeaderboard'; // Key for local leaderboard
+
+  // ======================================
+  // Lógica para el efecto Matrix de gotas de agua
+  // ======================================
+  const matrixBackground = document.getElementById('matrix-background');
+  const characters = '💧';
+  const numColumns = 50;
+  const columnSpeedMin = 3;
+  const columnSpeedMax = 20;
+  const columnDelayMin = 0;
+  const columnDelayMax = 5;
+
+  function getRandomCharacter() {
+    return characters;
+  }
+
+  function createMatrixColumn(columnIndex) {
+    const column = document.createElement('div');
+    column.classList.add('matrix-column');
+    column.style.left = `${(columnIndex / numColumns) * 100}%`;
+    column.style.animationDuration = `${Math.random() * (columnSpeedMax - columnSpeedMin) + columnSpeedMin}s`;
+    column.style.animationDelay = `${Math.random() * (columnDelayMax - columnDelayMin) + columnDelayMin}s`;
+
+    let columnContent = '';
+    const numDrops = Math.floor(window.innerHeight / 20);
+    for (let i = 0; i < numDrops; i++) {
+      columnContent += getRandomCharacter() + '\n';
+    }
+    column.textContent = columnContent;
+    matrixBackground.appendChild(column);
+  }
+
+  function generateMatrixEffect() {
+    matrixBackground.innerHTML = '';
+    for (let i = 0; i < numColumns; i++) {
+      createMatrixColumn(i);
+    }
+  }
+
+  window.addEventListener('resize', generateMatrixEffect);
+
+
+  // ======================================
+  // Lógica para el Chatbot IA Jamar
+  // ======================================
+  const chatMessages = document.getElementById('chat-messages');
+  const chatUserInput = document.getElementById('chat-user-input');
+  const chatContainer = document.getElementById('chat-container');
+  const chatMinimizeButton = document.getElementById('chat-minimize-button');
+  const openIaJamarButton = document.getElementById('open-ia-jamar-button');
+  let chatState = 'initial';
+  let hasChatGreeted = false;
+
+  const waterConservationResponses = {
+    '1': "Cuidar el agua ayuda a que siempre tengamos agua limpia para beber, cocinar y limpiar, protege la naturaleza porque los ríos, lagos y animales necesitan agua limpia; además, ahorrar agua reduce el gasto de dinero en casa y en la comunidad.",
+    '2': "Hay más riesgo de sequías, suben los costos para traer o limpiar agua y se contaminan más los ríos y mares.",
+    '3': "Para cuidar el agua se puede cerrar el grifo mientras te cepillas los dientes, bañarte en menos tiempo, arreglar goteras, juntar agua de lluvia para regar plantas y usar electrodomésticos que ahorren agua.",
+    '4': "Las escuelas pueden dar charlas y talleres sobre el cuidado del agua, poner carteles en pasillos, revisar fugas de agua, crear proyectos de reciclaje y celebrar fechas especiales para enseñar a los alumnos a ahorrar.",
+    '5': "Hoy existen grifos y duchas que usan menos agua, inodoros que gastan poca agua, sistemas de riego por goteo para no desperdiciar en los campos, plantas para limpiar y volver a usar el agua y tanques para recolectar agua de lluvia"
+  };
+
+  function appendChatMessage(message, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', sender);
+    messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function initialChatGreeting() {
+    if (!hasChatGreeted) {
+      setTimeout(() => {
+        appendChatMessage("¡Hola! Soy una IA diseñada por el equipo Jamar.", 'bot');
+        setTimeout(() => {
+          appendChatMessage("¿Quieres saber más sobre este prototipo y el cuidado del agua?", 'bot');
+          chatState = 'awaiting_yes_no';
+        }, 1000);
+      }, 500);
+      hasChatGreeted = true;
+    }
+  }
+
+  async function sendChatMessage() {
+    const message = chatUserInput.value.trim();
+    if (message === '') return;
+
+    appendChatMessage(message, 'user');
+    chatUserInput.value = '';
+
+    const typingIndicator = document.createElement('div');
+    typingIndicator.classList.add('message', 'bot');
+    typingIndicator.innerHTML = '<span>Pensando...</span> <span class="typing-indicator">.</span><span class="typing-indicator">.</span><span class="typing-indicator">.</span>';
+    chatMessages.appendChild(typingIndicator);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    setTimeout(async () => {
+      await handleBotResponse(message);
+      chatMessages.removeChild(typingIndicator);
+    }, 700);
+  }
+
+  async function handleBotResponse(userMessage) {
+    const lowerCaseMessage = userMessage.toLowerCase();
+    let botResponse = '';
+    let handledByPredefined = false;
+
+    const numericMessage = parseInt(lowerCaseMessage);
+    if (!isNaN(numericMessage) && numericMessage >= 1 && numericMessage <= 5) {
+        const predefinedResponse = waterConservationResponses[numericMessage.toString()];
+        if (predefinedResponse) {
+            botResponse = predefinedResponse + "\n\n¿Hay algo más en lo que pueda ayudarte sobre el cuidado del agua? Escribe un número del 1 al 6 o hazme otra pregunta.";
+            handledByPredefined = true;
+            chatState = 'general_ai';
+        }
+    }
+
+    if (!handledByPredefined) {
+        if (chatState === 'awaiting_yes_no') {
+            if (lowerCaseMessage.includes('si')) {
+                let optionsMessage = "¡Excelente! Aquí tienes 5 opciones sobre el cuidado del agua:\n\n";
+                optionsMessage += "1. ¿Qué beneficios tiene cuidar el agua?\n";
+                optionsMessage += "2. ¿Qué consecuencias trae el desperdiciar agua?\n";
+                optionsMessage += "3. ¿Qué hago para cuidar el agua?\n";
+                optionsMessage += "4. ¿Qué pueden hacer las escuelas para promover la concientización sobre el cuidado del agua?\n";
+                optionsMessage += "5. ¿Qué tecnologías existen para el cuidado del agua?\n";
+                optionsMessage += "6. Tengo otra duda.\n\n";
+                optionsMessage += "Por favor, escribe el número de la opción que te interese.";
+                botResponse = optionsMessage;
+                chatState = 'awaiting_option';
+            } else if (lowerCaseMessage.includes('no')) {
+                botResponse = "De acuerdo. Puedes preguntarme cualquier otra cosa ahora.";
+                chatState = 'general_ai';
+            } else {
+                botResponse = "Por favor, responde 'sí' o 'no'.";
+            }
+        } else if (chatState === 'awaiting_option') {
+            if (lowerCaseMessage === '6' || lowerCaseMessage.includes('otra duda') || lowerCaseMessage.includes('duda aparte') || lowerCaseMessage.includes('cambiar de tema') || lowerCaseMessage.includes('pregunta sobre otra cosa') || lowerCaseMessage.includes('preguntar sobre otra cosa')) {
+                botResponse = "De acuerdo. Puedes preguntarme cualquier otra cosa ahora.";
+                chatState = 'general_ai';
+            } else {
+                botResponse = "Disculpa, no reconozco esa opción. Por favor, ingresa un número del 1 al 6 para obtener información o di '6' para preguntar otra cosa.";
+            }
+        }
+    }
+
+    if (chatState === 'general_ai' && !handledByPredefined) {
+        try {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const chatHistory = [{ role: "user", parts: [{ text: userMessage }] }];
+            const payload = { contents: chatHistory };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                botResponse = result.candidates[0].content.parts[0].text;
+            } else {
+                botResponse = "Lo siento, no pude generar una respuesta en este momento. Por favor, intenta de nuevo.";
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            botResponse = "Hubo un error al conectar con la IA. Por favor, inténtalo de nuevo más tarde.";
+        }
+    }
+    appendChatMessage(botResponse, 'bot');
+  }
+
+  function handleChatKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendChatMessage();
+    }
+  }
+
+  chatMinimizeButton.addEventListener('click', () => {
+    chatContainer.classList.toggle('minimized');
+    if (chatContainer.classList.contains('minimized')) {
+        chatMinimizeButton.textContent = '+';
+    } else {
+        chatMinimizeButton.textContent = '−';
+    }
+  });
+
+  // ======================================
+  // Lógica para el Juego del Pulpo Sabio
+  // ======================================
+  const openOctopusGameButton = document.getElementById('open-octopus-game-button');
+  const octopusGameContainer = document.getElementById('octopus-game-container');
+  const gameMinimizeButton = document.getElementById('game-minimize-button');
+  const gameMessagesHistory = document.getElementById('game-messages-history');
+  const gameUserInput = document.getElementById('game-user-input');
+  const gameOctopusImage = document.getElementById('game-octopus-image');
+  const octopusSpeechBubble = document.getElementById('octopus-speech-bubble');
+  const healthDisplay = document.getElementById('health-display');
+  const levelDisplay = document.getElementById('level-display');
+  const happinessDisplay = document.getElementById('happiness-display');
+
+  // Referencias a elementos de la UI del modal de usuario
+  const usernameModalOverlay = document.getElementById('username-modal-overlay');
+  const usernameInput = document.getElementById('username-input');
+  const saveUsernameButton = document.getElementById('save-username-button');
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  const leaderboardList = document.getElementById('leaderboard-list');
+
+  let currentUsername = null; // Nombre de usuario del jugador
+
+  // Variables de estado del juego
+  let gameData = {
+    health: 100,
+    level: 1,
+    happiness: 100,
+    lastActionTime: Date.now(),
+    currentQuestion: null,
+    questionsAnswered: 0
+  };
+
+  // Preguntas y respuestas sobre el agua
+  const waterQuestions = [
+    {
+      question: "¿Cuál de estas acciones ayuda más a ahorrar agua al lavar los platos?",
+      options: ["A) Dejar el grifo abierto", "B) Usar un lavavajillas lleno", "C) Lavar a mano con el grifo abierto", "D) Usar una esponja con jabón y luego enjuagar rápidamente"],
+      answer: "D",
+      hint: "Piensa en cómo minimizar el tiempo que el agua corre."
+    },
+    {
+      question: "¿Es verdad que una ducha corta (5 minutos) gasta menos agua que un baño de tina?",
+      options: ["A) Verdadero", "B) Falso"],
+      answer: "A",
+      hint: "Los baños de tina suelen usar mucha más agua."
+    },
+    {
+      question: "¿Qué porcentaje del agua del planeta es agua dulce disponible para beber?",
+      options: ["A) Aproximadamente 70%", "B) Menos del 3%", "C) Cerca del 10%", "D) Alrededor del 25%"],
+      answer: "B",
+      hint: "La mayor parte del agua es salada o está congelada."
+    },
+    {
+      question: "¿Qué es mejor para regar las plantas y ahorrar agua?",
+      options: ["A) Usar una manguera abierta sin control", "B) Regar en las horas de más calor del día", "C) Usar un sistema de riego por goteo o regadera", "D) Dejar la llave goteando sobre las plantas"],
+      answer: "C",
+      hint: "Busca métodos que entreguen el agua directamente a las raíces."
+    },
+    {
+      question: "¿Qué significa 'estrés hídrico'?",
+      options: ["A) Cuando el agua está muy fría", "B) Cuando la demanda de agua es mayor que la cantidad disponible", "C) Cuando hay mucha agua en un lugar", "D) Cuando el agua está contaminada"],
+      answer: "B",
+      hint: "Relacionado con la escasez de agua."
+    }
+  ];
+
+  function appendGameMessage(message, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('game-message', sender === 'player' ? 'player-action' : 'octopus-response');
+    messageDiv.innerHTML = message;
+    gameMessagesHistory.appendChild(messageDiv);
+    gameMessagesHistory.scrollTop = gameMessagesHistory.scrollHeight;
+  }
+
+  function showOctopusSpeech(message) {
+    octopusSpeechBubble.textContent = message;
+    octopusSpeechBubble.style.display = 'block';
+    setTimeout(() => {
+      octopusSpeechBubble.style.display = 'none';
+    }, 3000); // La burbuja desaparece después de 3 segundos
+  }
+
+  function updateGameStats() {
+    healthDisplay.textContent = `${gameData.health}%`;
+    levelDisplay.textContent = gameData.level;
+    happinessDisplay.textContent = `${gameData.happiness}%`;
+
+    if (gameData.health < 30) {
+      healthDisplay.style.color = '#e74c3c';
+    } else if (gameData.health < 70) {
+      healthDisplay.style.color = '#f39c12';
+    } else {
+      healthDisplay.style.color = '#2ecc71';
+    }
+
+    if (gameData.happiness < 30) {
+      happinessDisplay.style.color = '#e74c3c';
+    } else if (gameData.happiness < 70) {
+      happinessDisplay.style.color = '#f39c12';
+    } else {
+      happinessDisplay.style.color = '#2ecc71';
+    }
+  }
+
+  function initialGameGreeting() {
+    setTimeout(() => {
+      showOctopusSpeech("¡Hola! Soy el Pulpo Sabio.");
+      appendGameMessage("El Pulpo Sabio: ¡Hola! Soy tu amigo, el Pulpo Sabio. Te ayudaré a aprender sobre el agua y juntos cuidaremos el océano.", 'octopus');
+      setTimeout(() => {
+        appendGameMessage("El Pulpo Sabio: Puedes alimentarme, bañarme o preguntarme algo. ¡Vamos a divertirnos y aprender!", 'octopus');
+      }, 2000);
+    }, 500);
+  }
+
+  function performCareAction(action) {
+    appendGameMessage(`Tú: Has decidido ${action === 'feed' ? 'alimentar' : action === 'bath' ? 'bañar' : 'jugar'} con el pulpo.`, 'player');
+    let message = "";
+    let happinessChange = 0;
+
+    switch(action) {
+      case 'feed':
+        message = "¡Ñam ñam! ¡Gracias por la comida, estoy lleno de energía!";
+        happinessChange = 15;
+        break;
+      case 'bath':
+        message = "¡Qué refrescante! ¡Me siento limpio y feliz!";
+        happinessChange = 20;
+        break;
+      case 'play':
+        askQuestion();
+        return;
+    }
+
+    gameData.happiness = Math.min(100, gameData.happiness + happinessChange);
+    showOctopusSpeech(message);
+    appendGameMessage(`El Pulpo Sabio: ${message}`, 'octopus');
+    updateGameStats();
+    saveGameData(); // Guardar cambios en Local Storage
+  }
+
+  function askQuestion() {
+    if (waterQuestions.length === 0) {
+      showOctopusSpeech("¡Wow! ¡Ya me hiciste todas las preguntas que tenía! ¡Eres muy inteligente!");
+      appendGameMessage("El Pulpo Sabio: ¡Ya me hiciste todas las preguntas! ¡Eres muy inteligente!", 'octopus');
+      gameData.currentQuestion = null;
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * waterQuestions.length);
+    gameData.currentQuestion = waterQuestions[randomIndex];
+
+    showOctopusSpeech("¡Prepárate para una pregunta!");
+    appendGameMessage(`El Pulpo Sabio: ${gameData.currentQuestion.question}`, 'octopus');
+
+    gameData.currentQuestion.options.forEach(opt => {
+      appendGameMessage(`El Pulpo Sabio: ${opt}`, 'octopus');
+    });
+
+    appendGameMessage("El Pulpo Sabio: Escribe la letra de tu respuesta (A, B, C, D).", 'octopus');
+  }
+
+  async function handleGameMessage(userMessage) {
+    const lowerCaseMessage = userMessage.toLowerCase().trim();
+
+    if (gameData.currentQuestion) {
+      const userAnswer = lowerCaseMessage.toUpperCase();
+      if (userAnswer === gameData.currentQuestion.answer) {
+        showOctopusSpeech("¡Eso es! ¡Respuesta correcta! ¡Eres genial!");
+        appendGameMessage(`El Pulpo Sabio: ¡Correcto! Tu salud sube +5%.`, 'octopus');
+        
+        gameData.health = Math.min(100, gameData.health + 5);
+        
+        if (gameData.health === 100) {
+            gameData.happiness = Math.min(100, gameData.happiness + 5);
+            if (gameData.happiness === 100) {
+                gameData.questionsAnswered++;
+                checkLevelUp();
+            }
+        }
+      } else {
+        showOctopusSpeech(`Casi... la respuesta correcta era ${gameData.currentQuestion.answer}. ¡No te rindas!`);
+        appendGameMessage(`El Pulpo Sabio: Incorrecto. La respuesta era ${gameData.currentQuestion.answer}. ${gameData.currentQuestion.hint}. Tu salud baja -5%.`, 'octopus');
+        gameData.health = Math.max(0, gameData.health - 5);
+      }
+      gameData.currentQuestion = null;
+      updateGameStats();
+      saveGameData(); // Guardar cambios en Local Storage
+
+      if (gameData.health <= 0) {
+          showOctopusSpeech("¡Oh no! ¡Mi salud ha llegado a 0! Necesito descansar...");
+          appendGameMessage("El Pulpo Sabio: ¡Mi salud ha llegado a 0! Necesito descansar. Por favor, cuídame para recuperarme.", 'octopus');
+          gameData.health = 0;
+          updateGameStats();
+          saveGameData(); // Guardar el estado de salud 0
+          return;
+      }
+
+      setTimeout(() => {
+        showOctopusSpeech("¿Quieres que te pregunte algo más? O prefieres cuidarme.");
+        appendGameMessage("El Pulpo Sabio: ¿Quieres que te pregunte algo más? Haz click en 'Pregúntame' o elije otra acción de cuidado.", 'octopus');
+      }, 1500);
+    } else {
+      showOctopusSpeech("Hmm, no estoy seguro de qué quieres hacer. Usa los botones para cuidarme o para que te pregunte algo.");
+      appendGameMessage("El Pulpo Sabio: No te entiendo bien. Usa los botones 'Alimentar', 'Bañar' o 'Pregúntame'.", 'octopus');
+    }
+  }
+
+  function checkLevelUp() {
+    if (gameData.questionsAnswered >= gameData.level * 3) {
+      gameData.level++;
+      gameData.questionsAnswered = 0;
+      showOctopusSpeech(`¡Felicidades! ¡Hemos subido al Nivel ${gameData.level}! ¡Más sabios juntos!`);
+      appendGameMessage(`El Pulpo Sabio: ¡Felicidades! ¡Hemos subido al Nivel ${gameData.level}! 🎉`, 'octopus');
+    }
+  }
+
+  let happinessDrainInterval;
+  function passiveHappinessDrain() {
+    const now = Date.now();
+    const timeElapsed = (now - gameData.lastActionTime) / 1000 / 60;
+    const drainRate = 1;
+
+    if (timeElapsed >= 1) {
+      gameData.happiness = Math.max(0, gameData.happiness - Math.floor(timeElapsed * drainRate));
+      gameData.lastActionTime = now;
+      updateGameStats();
+      if (gameData.happiness <= 20 && gameData.happiness > 0) {
+        showOctopusSpeech("¡Me siento un poco triste y aburrido! ¿Puedes cuidarme?");
+        appendGameMessage("El Pulpo Sabio: ¡Me siento un poco triste y aburrido! ¿Puedes cuidarme?", 'octopus');
+      } else if (gameData.happiness === 0) {
+        showOctopusSpeech("Zzz... ¡Estoy muy agotado!");
+        appendGameMessage("El Pulpo Sabio: Zzz... Necesito atención.", 'octopus');
+      }
+      saveGameData(); // Guardar cambios en Local Storage
+    }
+    happinessDrainInterval = setTimeout(passiveHappinessDrain, 60000);
+  }
+
+  function sendGameMessage() {
+    const message = gameUserInput.value.trim();
+    if (message === '') return;
+
+    appendGameMessage(message, 'player');
+    gameUserInput.value = '';
+
+    setTimeout(() => {
+      handleGameMessage(message);
+    }, 700);
+  }
+
+  function handleGameKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendGameMessage();
+    }
+  }
+
+  gameMinimizeButton.addEventListener('click', () => {
+    octopusGameContainer.classList.toggle('minimized');
+    if (octopusGameContainer.classList.contains('minimized')) {
+        gameMinimizeButton.textContent = '+';
+    } else {
+        gameMinimizeButton.textContent = '−';
+    }
+  });
+
+  // ======================================
+  // Lógica de Guardado y Carga de Datos (Local Storage)
+  // ======================================
+
+  function loadGameDataAndProfile() {
+    const storedGameData = localStorage.getItem(LOCAL_STORAGE_GAME_DATA_KEY);
+    if (storedGameData) {
+        gameData = JSON.parse(storedGameData);
+    }
+    currentUsername = localStorage.getItem(LOCAL_STORAGE_USERNAME_KEY);
+
+    // Si no hay nombre de usuario, mostrar el modal para que lo ingrese
+    if (!currentUsername) {
+        showUsernameModal();
+        leaderboardContainer.classList.remove('visible'); // Ocultar hasta que elija nombre
+    } else {
+        leaderboardContainer.classList.add('visible'); // Mostrar clasificación si ya tiene nombre
+    }
+    updateGameStats(); // Actualizar la UI con los datos cargados
+    displayLocalLeaderboard(); // Mostrar la clasificación local
+  }
+
+  function saveGameData() {
+    localStorage.setItem(LOCAL_STORAGE_GAME_DATA_KEY, JSON.stringify(gameData));
+    localStorage.setItem(LOCAL_STORAGE_USERNAME_KEY, currentUsername); // Asegurar que el username se guarda también
+    updateLocalLeaderboard(currentUsername, gameData.questionsAnswered); // Actualizar y guardar el leaderboard
+  }
+
+  // ======================================
+  // Lógica de la Tabla de Clasificación Local
+  // ======================================
+
+  function loadLocalLeaderboard() {
+      const storedLeaderboard = localStorage.getItem(LOCAL_STORAGE_LEADERBOARD_KEY);
+      return storedLeaderboard ? JSON.parse(storedLeaderboard) : [];
+  }
+
+  function updateLocalLeaderboard(username, score) {
+      let leaderboard = loadLocalLeaderboard();
+      let playerFound = false;
+
+      for (let i = 0; i < leaderboard.length; i++) {
+          if (leaderboard[i].username === username) {
+              leaderboard[i].questionsAnswered = score;
+              playerFound = true;
+              break;
+          }
+      }
+
+      if (!playerFound) {
+          leaderboard.push({ username: username, questionsAnswered: score });
+      }
+
+      // Ordenar la clasificación por puntaje (descendente)
+      leaderboard.sort((a, b) => b.questionsAnswered - a.questionsAnswered);
+
+      // Mantener solo el top 100
+      leaderboard = leaderboard.slice(0, 100);
+
+      localStorage.setItem(LOCAL_STORAGE_LEADERBOARD_KEY, JSON.stringify(leaderboard));
+      displayLocalLeaderboard(); // Actualizar la UI de la clasificación
+  }
+
+  function displayLocalLeaderboard() {
+      const leaderboard = loadLocalLeaderboard();
+      leaderboardList.innerHTML = ''; // Limpiar lista actual
+
+      if (leaderboard.length === 0) {
+          leaderboardList.innerHTML = '<li>No hay jugadores en la clasificación aún.</li>';
+          return;
+      }
+
+      leaderboard.forEach((player, index) => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('leaderboard-item');
+          listItem.innerHTML = `
+              <span class="rank">${index + 1}.</span>
+              <span class="username">${player.username}</span>
+              <span class="score">${player.questionsAnswered} preguntas</span>
+          `;
+          leaderboardList.appendChild(listItem);
+      });
+      leaderboardContainer.classList.add('visible'); // Asegurarse de que el contenedor sea visible
+  }
+
+  // ======================================
+  // Lógica del Modal de Nombre de Usuario
+  // ======================================
+
+  function showUsernameModal() {
+    usernameModalOverlay.classList.add('visible');
+    usernameInput.focus(); // Poner el foco en el input
+  }
+
+  saveUsernameButton.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    if (username.length < 3) {
+      alert('El nombre de usuario debe tener al menos 3 caracteres.');
+      return;
+    }
+    currentUsername = username;
+    usernameModalOverlay.classList.remove('visible');
+    saveGameData(); // Guardar el nuevo nombre de usuario y los datos iniciales
+    displayLocalLeaderboard(); // Asegurar que la clasificación se actualice
+  });
+
+
+  // ======================================
+  // Control de visibilidad de los contenedores
+  // ======================================
+  function hideAllModals() {
+    chatContainer.classList.remove('visible', 'minimized');
+    octopusGameContainer.classList.remove('visible', 'minimized');
+    chatMinimizeButton.textContent = '−';
+    gameMinimizeButton.textContent = '−';
+    clearTimeout(happinessDrainInterval);
+  }
+
+  openIaJamarButton.addEventListener('click', () => {
+    hideAllModals();
+    chatContainer.classList.add('visible');
+    initialChatGreeting();
+  });
+
+  openOctopusGameButton.addEventListener('click', () => {
+    // Si el usuario no tiene un nombre de usuario, mostrar el modal
+    if (!currentUsername) {
+        showUsernameModal();
+        return; // No abrir el juego todavía
+    }
+    hideAllModals();
+    octopusGameContainer.classList.add('visible');
+    initialGameGreeting();
+    passiveHappinessDrain();
+  });
+
+
+  // Global window load
+  window.onload = function() {
+    document.getElementById('header-container').classList.add('fade-in');
+    document.getElementById('main-content').classList.add('fade-in');
+    generateMatrixEffect();
+    loadGameDataAndProfile(); // Cargar datos y perfil al inicio
+  };
+</script>
+<style>
+/* Typing indicator animation */
+@keyframes blink-dot {
+    0%, 100% { opacity: 0; }
+    33% { opacity: 1; }
+    66% { opacity: 0; }
+}
+
+.typing-indicator {
+    animation: blink-dot 1.5s infinite;
+}
+
+.typing-indicator:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.typing-indicator:nth-child(3) {
+    animation-delay: 1s;
+}
+</style>
+</body>
+</html>
